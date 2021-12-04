@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
     mode: 'development',
-    entry: './src/day02.ts',
+    entry: './src/day03/01.ts',
     devtool: 'inline-source-map',
     module: {
         rules: [
@@ -10,6 +10,10 @@ module.exports = {
                 test: /\.tsx?$/,
                 use: 'ts-loader',
                 exclude: /node_modules/,
+            },
+            {
+                test: /\.txt$/,
+                use: 'raw-loader',
             },
         ],
     },
@@ -19,5 +23,6 @@ module.exports = {
     output: {
         filename: 'bundle.js',
         path: path.resolve(__dirname, 'dist'),
-    }
+    },
+    watch: true
 }
