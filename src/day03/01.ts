@@ -1,6 +1,6 @@
 const text = require('./input.txt');
-
 const binArr = text.default.split("\n");
+export {}
 
 /*
 1. create a sum array of the length of the binary.
