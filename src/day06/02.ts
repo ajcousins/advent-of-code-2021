@@ -4,7 +4,7 @@ export {}
 const DAYS = 256;
 const initialState = text.default.split(",").map((val:string) => Number(val)).sort();
 
-let populations = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+let populations = new Array(9).fill(0);
 
 initialState.forEach((fish:number) => {
     populations[fish]++;
