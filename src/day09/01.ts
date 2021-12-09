@@ -1,11 +1,7 @@
 const text = require('./input.txt');
 export {}
 
-console.log("Day 9");
-
 const grid = text.default.split("\n").map((row:string) => row.split("").map((digit) => Number(digit)));
-
-console.log(grid);
 
 let sum = 0;
 
