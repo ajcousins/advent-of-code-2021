@@ -1,13 +1,12 @@
-const text = require('./input_test.txt');
+const text = require('./input.txt');
 export {}
 
 const grid = text.default.split("\n").map((row:string) => row.split("").map((digit) => Number(digit)));
 
-console.log(grid);
-
 interface Coord {
     x:number, 
-    y:number
+    y:number,
+    val:number
 }
 
 const lowPoints:Coord[] = [];
@@ -20,44 +19,65 @@ for (let y = 0; y < grid.length; y++) {
         const right = x === grid[0].length - 1 ? 10 : grid[y][x + 1];
         const down = y === grid.length - 1 ? 10 : grid[y + 1][x];
         
-        current < Math.min(up, left, right, down) && (lowPoints.push({x, y}));
+        current < Math.min(up, left, right, down) && (lowPoints.push({x, y, val: grid[y][x]}));
     }
 }
 
-console.log("lowPoints:", lowPoints);
+function sumNeighbours(root:Coord) {
+  
+    const queue:Coord[] = []
+    const visited:Coord[] = []
+    queue.push(root);
 
+    while (queue.length) {
+        let current = queue.shift()
+        visited.push(current)
 
-function sumNeighbours(cur:Coord, from?:Coord, checked?:Coord[]) {
-    // define this location
-    const current = grid[cur.y][cur.x];
-    const up = cur.y === 0 ? 10 : grid[cur.y - 1][cur.x];
-    const left = cur.x === 0 ? 10 : grid[cur.y][cur.x - 1];
-    const right = cur.x === grid[0].length - 1 ? 10 : grid[cur.y][cur.x + 1];
-    const down = cur.y === grid.length - 1 ? 10 : grid[cur.y + 1][cur.x];
+        let up = getDirVal(current, "up")
+        let left = getDirVal(current, "left")
+        let right = getDirVal(current, "right")
+        let down = getDirVal(current, "down")
 
-    // if everything around me has been checked, then return 0;
-    // if (checked.)
+        const dirs = [up, left, right, down];
 
-    const neighbours:Coord[] = []
-    if (cur.y > 0) neighbours.push({x: cur.x, y: cur.y - 1});
-    else if (cur.y < grid.length - 1) neighbours.push({x: cur.x, y: cur.y + 1});
-    if (cur.x > 0) neighbours.push({x: cur.x + 1, y: cur.y});
-    else if (cur.x < grid[0].length - 1) neighbours.push({x: cur.x - 1, y: cur.y});
-    console.log("cur:", cur, "neighbours:", neighbours);
-    
+        dirs.forEach((dir) => {
+            if (dir && dir.val > current.val && dir.val !== 9 && !coordInArr(visited, dir) && !coordInArr(queue, dir)) {
+                queue.push(dir);
+            }
+        })
+    }
 
-
-
-    const toCheckNext:Coord[] = []
-
-
-    return 0;
+    return visited.length;
 }
 
 const basinSizes:number[] = []
-
 lowPoints.forEach((lowPoint:Coord) => {
     basinSizes.push(sumNeighbours(lowPoint))
 })
 
-console.log("basinSizes:", basinSizes);
+function getDirVal(coord:Coord, dir:string):Coord {
+    switch(dir) {
+        case "up":
+            if (coord.y === 0) return null
+            else return { x: coord.x, y: coord.y - 1, val: grid[coord.y - 1][coord.x]}
+        case "left":
+            if (coord.x === 0) return null
+            else return { x: coord.x - 1, y: coord.y, val: grid[coord.y][coord.x - 1]}
+        case "right":
+            if (coord.x === grid[0].length - 1) return null
+            else return { x: coord.x + 1, y: coord.y, val: grid[coord.y][coord.x + 1]}
+        case "down":
+            if (coord.y === grid.length - 1) return null
+            else return { x: coord.x, y: coord.y + 1, val: grid[coord.y + 1][coord.x]}
+        default:
+            return null;
+    }
+}
+
+function coordInArr(arr:Coord[], coord:Coord):boolean {
+    const refArr = [...arr]
+    const check = {...coord}
+    return refArr.some((row:Coord, i) => row.x === check.x && row.y === check.y)
+}
+
+console.log("basinSizes:", basinSizes.sort((a, b) => a < b ? 1 : -1).slice(0, 3).reduce((c, p) => c * p));
