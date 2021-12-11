@@ -1,4 +1,4 @@
-const text = require('./input_test.txt');
+const text = require('./input.txt');
 export {}
 
 const lines = text.default.split("\n").map((row:string) => row.split(""))
@@ -22,7 +22,16 @@ const parsed = lines.map((line:string[]) => {
     return stack
 })
 
-const results = parsed
+const answer = parsed.filter((row:number|string[]) =>  typeof row !== "number")
+                     .map((row:string[]) => [...row]
+                        .reverse().map((char:string) => {
+                            return char === "(" ? 1 :
+                                   char === "[" ? 2 :
+                                   char === "{" ? 3 : 4
+                        }))
 
-console.log("results:", results);
+const scores = answer.map((row:number[]) => [...row].reduce((p:number, c:number) => (p * 5) + c , 0))
 
+const winner = [...scores].sort((a:number, b:number) => a > b ? 1 : -1)[(scores.length - 1) / 2]
+
+console.log("winner:", winner);
