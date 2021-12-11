@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
     mode: 'development',
-    entry: './src/day11/01.ts',
+    entry: './src/day11/02.ts',
     devtool: 'inline-source-map',
     module: {
         rules: [

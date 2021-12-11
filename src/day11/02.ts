@@ -11,8 +11,15 @@ const grid = text.default.split("\n")
 
 let flashCounter = 0;
 
-function runGrid(grid:number[][], steps:number):number[][]{
+function runGrid(grid:number[][], steps:number, ref?:number):number[][]{
     if (!steps) return grid;
+
+    const isInSync = [...grid].flat().every((val:number, i, arr) => val === arr[0])
+
+    if (isInSync) {
+        console.log(`In sync at step ${ref - steps}.`)
+        return grid
+    }
 
     const gridCopy = grid.map((row:number[]) => row.slice());
     for (let y = 0; y < gridCopy.length; y++) {
@@ -44,7 +51,7 @@ function runGrid(grid:number[][], steps:number):number[][]{
             }
         }
     }
-    return runGrid(gridCopy, steps - 1);
+    return runGrid(gridCopy, steps - 1, ref ? ref : steps);
 }
 
 function adjCells(y:number, x:number, grid:number[][]):Coord[] {
@@ -64,5 +71,4 @@ function adjCells(y:number, x:number, grid:number[][]):Coord[] {
     });
 }
 
-console.log(runGrid(grid, 250));
-console.log("flashes:", flashCounter);
+console.log(runGrid(grid, 300));
