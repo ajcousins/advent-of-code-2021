@@ -9,6 +9,9 @@ interface Coord {
 const coords = text.default.split("\n\n")[0].split("\n").map((line:string) => {
     return { x: line.split(",")[0], y: line.split(",")[1] }
 });
+const instructions = text.default.split("\n\n")[1].split("\n").map((line:string) => {
+    return line.split(" ")[2].split("=")
+});
 
 const width = coords.reduce((p:number, c:any) => Math.max(p, Number(c.x)), 0)
 const height = coords.reduce((p:number, c:any) => Math.max(p, Number(c.y)), 0)
@@ -34,9 +37,11 @@ function fold(grid:string[][], axis:string, lineNum:number) {
     return gridCopy;
 }
 
-const result = fold(grid, 'x', 655);
+const queue = [... instructions];
+let gridStart = [...grid];
+while (queue.length) {
+    let thisAction = queue.shift();
+    gridStart = fold(gridStart, thisAction[0], Number(thisAction[1]))
+}
 
-console.log(result.flat().reduce((p:number, c:string) => {
-    if (c === "#") return p + 1;
-    else return p;
-}, 0));
+console.log(gridStart);
