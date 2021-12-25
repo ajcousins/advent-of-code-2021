@@ -1,4 +1,4 @@
-const text = require('./input_test.txt');
+const text = require('./input.txt');
 export {}
 
 interface Coord {
@@ -11,6 +11,11 @@ interface Area {
     xMax: number;
     yMin: number;
     yMax: number;
+}
+
+interface Report {
+    success: boolean;
+    highestY: number;
 }
 
 const targetArr = text.default.split(" ")
@@ -26,10 +31,16 @@ const target:Area = {
 }
 console.log(target);
 
-function probe(sVel:Coord, curPos:Coord, target:Area):boolean {
+function probe(sVel:Coord, target:Area, curPos?:Coord, highestY?:number):Report {
+    // SET EMPTY PARAMS
+    if (!curPos) curPos = {x: 0, y: 0};
+    if (!highestY) highestY = curPos.y;
+
     // ARE WE THERE YET?
     if (curPos.x >= target.xMin && curPos.x <= target.xMax
-    && curPos.y >= target.yMin && curPos.y <= target.yMax) return true;
+    && curPos.y >= target.yMin && curPos.y <= target.yMax) {
+        return { success: true, highestY: highestY }
+    };
     
     // UPDATE STATS
     const newPos = {...curPos};
@@ -41,31 +52,42 @@ function probe(sVel:Coord, curPos:Coord, target:Area):boolean {
     if (sVel.x < 0) newVel.x += 1;
     newVel.y -= 1;
 
-    console.log("newPos:", newPos, "newVel:", newVel);
-    // if vel.y is < 0 and distance to target is increasing
-    // (probe is getting faster but moving further away from target): stop
+    if (newPos.y > highestY) highestY = newPos.y;
+
+    console.log("newPos:", newPos, "newVel:", newVel, "highestY:", highestY);
 
     // HAVE WE MISSED?
     const prevYFromTarget = Math.abs(curPos.y - target.yMin);
     const curYFromTarget = Math.abs(newPos.y - target.yMin);
 
-    if (sVel.y < 0 && curYFromTarget > prevYFromTarget) {
-        console.log("Missed Y");
-        return false
-    }
-    if (newPos.x > target.xMax) {
-        console.log("Missed X");
-        return false
-    }
+    if (sVel.y < 0 && curYFromTarget > prevYFromTarget) 
+        return { success: false, highestY: highestY }
+    
+    if (newPos.x > target.xMax)
+        return { success: false, highestY: highestY }
 
-
-    return probe(newVel, newPos, target);
+    return probe(newVel, target, newPos, highestY);
 }
-console.log(probe({x:2, y:20}, {x:0, y:0}, target));
 
-/*
-- try to get rid of 'steps' in function. Get function to determine if it has missed target
-- if curPos.y is increasing: keep going
-- if curPos.y is decreasing, and distance to target is decreasing: keep going
-- if curPos.x is greater than target.xMax: stop
-*/
+
+const sVelToTry:Coord[] = [];
+
+const tries:any = []
+
+const yLimit = 100;
+
+for (let y = 1; y <= yLimit; y++) {
+    for (let x = 1; x <= y; x++) {
+        sVelToTry.push({x, y})
+    }
+}
+
+sVelToTry.forEach((vel:Coord) => {
+    const report = probe({x: vel.x, y: vel.y}, target)
+    if (report.success) {
+
+        tries.push({sVel: vel, highestY: report.highestY})
+    }
+})
+
+console.log(tries);
