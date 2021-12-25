@@ -26,11 +26,12 @@ const target:Area = {
 }
 console.log(target);
 
-function probe(sVel:Coord, curPos:Coord, target:Area, steps:number):boolean {
+function probe(sVel:Coord, curPos:Coord, target:Area):boolean {
+    // ARE WE THERE YET?
     if (curPos.x >= target.xMin && curPos.x <= target.xMax
     && curPos.y >= target.yMin && curPos.y <= target.yMax) return true;
-    if (steps === 0) return false;
-
+    
+    // UPDATE STATS
     const newPos = {...curPos};
     newPos.x += sVel.x;
     newPos.y += sVel.y;
@@ -41,9 +42,26 @@ function probe(sVel:Coord, curPos:Coord, target:Area, steps:number):boolean {
     newVel.y -= 1;
 
     console.log("newPos:", newPos, "newVel:", newVel);
-    return probe(newVel, newPos, target, steps - 1);
+    // if vel.y is < 0 and distance to target is increasing
+    // (probe is getting faster but moving further away from target): stop
+
+    // HAVE WE MISSED?
+    const prevYFromTarget = Math.abs(curPos.y - target.yMin);
+    const curYFromTarget = Math.abs(newPos.y - target.yMin);
+
+    if (sVel.y < 0 && curYFromTarget > prevYFromTarget) {
+        console.log("Missed Y");
+        return false
+    }
+    if (newPos.x > target.xMax) {
+        console.log("Missed X");
+        return false
+    }
+
+
+    return probe(newVel, newPos, target);
 }
-console.log(probe({x:9, y:0}, {x:0, y:0}, target, 20));
+console.log(probe({x:2, y:20}, {x:0, y:0}, target));
 
 /*
 - try to get rid of 'steps' in function. Get function to determine if it has missed target
