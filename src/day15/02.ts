@@ -44,6 +44,35 @@ for (let i = 0; i < 4; i++) {
 
 console.log(grid);
 
+function renderGrid(grid:number[][]) {
+    const root = document.getElementById("anchor");
+    console.log("root:", root);
+    
+    const canvas = document.createElement("div");
+    canvas.style.backgroundColor = "#ffeeee"
+    canvas.style.width = "1000px"
+    canvas.style.height = "50px"
+    root.appendChild(canvas)
+
+    grid.forEach((row:number[], y) => {
+        const rowDiv = document.createElement("div");
+        rowDiv.style.backgroundColor = "#9999ff"
+        rowDiv.style.display = "flex"
+        canvas.appendChild(rowDiv)
+        row.forEach((sq: number, x) => {
+            const square = document.createElement("div");
+            square.style.backgroundColor = "#eeeeee"
+            square.style.width = "10px";
+            square.style.height = "10px";
+            square.style.fontSize = "0.5rem"
+            square.id = `(${x}, ${y})`;
+            square.textContent = `${sq}`
+            rowDiv.appendChild(square);
+        })
+    })
+}
+renderGrid(grid)
+
 const start:Coord = {x: 0, y: 0, risk: grid[0][0]};
 const goal:Coord = {x: grid[0].length - 1, y: grid.length - 1, risk: grid[grid.length - 1][grid[0].length - 1]};
 
@@ -90,6 +119,7 @@ function shortestPath(start:Coord, end:Coord) {
         }
     }
     console.log("path:", path);
+    highlightPath(path);
     return path.reverse()
 }
 
@@ -106,5 +136,12 @@ function validNeighbours(coord:Coord):Coord[] {
         (dir.y >= 0) && (dir.y < grid.length) && (dir.x >= 0) && (dir.x < grid[0].length))
     return possDirs.map((dir:Coord) => {
         return {...dir, risk: grid[dir.y][dir.x]}
+    })
+}
+
+function highlightPath(coords: Coord[]) {
+    coords.forEach((coord: Coord) => {
+        const square = document.getElementById(`(${coord.x}, ${coord.y})`)
+        square.style.backgroundColor = "yellow";
     })
 }
